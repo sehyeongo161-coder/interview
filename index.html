@@ -84,6 +84,60 @@
       font-size:16px;
     }
 
+    .storage-notice{
+      display:flex;
+      align-items:flex-start;
+      gap:10px;
+      margin-top:18px;
+      padding:12px 14px;
+      border:1px solid #eadb9f;
+      border-radius:12px;
+      background:#fff9df;
+      color:#66551b;
+      font-size:14px;
+    }
+
+    .storage-notice::before{
+      content:"ⓘ";
+      flex:0 0 auto;
+      color:#8a6d10;
+      font-weight:900;
+    }
+
+    .storage-error{
+      margin:9px 0 0;
+      padding:10px 13px;
+      border:1px solid #f0c9c9;
+      border-radius:10px;
+      background:#fff2f2;
+      color:#9a2f2f;
+      font-size:14px;
+      font-weight:750;
+    }
+
+    .save-status-row{
+      display:flex;
+      align-items:center;
+      min-height:25px;
+      margin-top:11px;
+      color:var(--muted);
+      font-size:13.5px;
+      font-weight:700;
+    }
+
+    .save-status-row::before{
+      content:"";
+      width:8px;
+      height:8px;
+      margin-right:8px;
+      border-radius:50%;
+      background:#9ca9b6;
+    }
+
+    .save-status-row[data-state="saving"]::before{background:#d89b1d;}
+    .save-status-row[data-state="saved"]::before{background:var(--green);}
+    .save-status-row[data-state="warning"]::before{background:#c2413b;}
+
     .toolbar{
       display:flex;
       flex-wrap:wrap;
@@ -103,7 +157,26 @@
 
     .primary{background:var(--navy); color:white;}
     .secondary{background:#eaf2f8; color:var(--navy);}
+    .backup{background:#e7f5f6; color:#0c6774;}
+    .danger{background:#fceeee; color:#a23636;}
     button:hover{transform:translateY(-1px); filter:brightness(.98);}
+    button:focus-visible,
+    nav a:focus-visible{
+      outline:3px solid rgba(37,99,166,.35);
+      outline-offset:3px;
+    }
+
+    .visually-hidden{
+      position:absolute !important;
+      width:1px !important;
+      height:1px !important;
+      padding:0 !important;
+      margin:-1px !important;
+      overflow:hidden !important;
+      clip:rect(0,0,0,0) !important;
+      white-space:nowrap !important;
+      border:0 !important;
+    }
 
     nav{
       position:sticky;
@@ -192,6 +265,21 @@
     }
 
     .card.teal .number{background:var(--teal);}
+
+    .written-badge{
+      display:inline-flex;
+      align-items:center;
+      min-height:26px;
+      margin-left:8px;
+      padding:3px 9px;
+      border:1px solid #b9dfc4;
+      border-radius:999px;
+      background:#eef9f1;
+      color:#2f7043;
+      font-size:12px;
+      font-weight:900;
+      vertical-align:middle;
+    }
 
     .card h2{
       margin:12px 0 10px;
@@ -337,6 +425,38 @@
       background:#fafcfd;
     }
 
+    .toast-region{
+      position:fixed;
+      right:20px;
+      bottom:20px;
+      z-index:1000;
+      display:grid;
+      width:min(380px, calc(100% - 32px));
+      gap:10px;
+      pointer-events:none;
+    }
+
+    .toast{
+      padding:13px 15px;
+      border:1px solid transparent;
+      border-radius:13px;
+      background:white;
+      box-shadow:0 12px 30px rgba(23,58,103,.18);
+      color:var(--ink);
+      font-size:14px;
+      font-weight:750;
+      animation:toast-in .2s ease-out;
+    }
+
+    .toast.success{border-color:#b9dfc4; background:#f2fbf4; color:#28643b;}
+    .toast.warning{border-color:#ead79b; background:#fff9df; color:#725c18;}
+    .toast.error{border-color:#efbcbc; background:#fff1f1; color:#9a2f2f;}
+
+    @keyframes toast-in{
+      from{opacity:0; transform:translateY(8px);}
+      to{opacity:1; transform:translateY(0);}
+    }
+
     @media (max-width:820px){
       .page{width:100%; margin:0; border-radius:0; border-left:0; border-right:0;}
       header{padding:30px 22px 24px;}
@@ -344,6 +464,13 @@
       .grid{grid-template-columns:1fr;}
       nav{padding-left:12px; padding-right:12px;}
       .card-head,.card-body{padding-left:18px; padding-right:18px;}
+    }
+
+    @media (max-width:560px){
+      .toolbar{display:grid; grid-template-columns:1fr;}
+      .toolbar button{width:100%;}
+      .storage-notice{font-size:13.5px;}
+      .toast-region{right:16px; bottom:16px;}
     }
 
     @media print{
@@ -355,7 +482,8 @@
         border-radius:0;
         box-shadow:none;
       }
-      .toolbar,nav,.note-wrap,footer{display:none !important;}
+      .toolbar,nav,.note-wrap,footer,.storage-notice,.storage-error,
+      .save-status-row,.toast-region,.written-badge,.visually-hidden{display:none !important;}
       header{padding:24px 28px 18px;}
       main{padding:20px 24px;}
       .grid{grid-template-columns:1fr 1fr; gap:12px;}
@@ -384,10 +512,23 @@
         먼저 본 질문만 짧게 던지고, 답변이 막히거나 추상적일 때 선택지와 꼬리질문을 제시하는 방식으로 구성했습니다.
         각 질문 아래 메모란은 브라우저에 자동 저장됩니다.
       </p>
+      <div class="storage-notice">
+        <span>메모는 이 브라우저에 자동 저장됩니다. 중요한 인터뷰 후에는 반드시 ‘메모 백업 저장’ 버튼으로 별도 파일을 보관하세요.</span>
+      </div>
+      <p class="storage-error" id="storageError" role="status" hidden>
+        브라우저 자동 저장을 사용할 수 없습니다. 메모 백업 저장 기능을 이용해 주세요.
+      </p>
+      <div class="save-status-row" id="saveStatus" data-state="idle" aria-live="polite" aria-atomic="true">
+        자동 저장 상태 확인 중…
+      </div>
       <div class="toolbar">
-        <button class="primary" onclick="window.print()">인쇄·PDF 저장</button>
-        <button class="secondary" id="compactBtn" onclick="toggleCompact()">핵심 질문만 보기</button>
-        <button class="secondary" onclick="clearNotes()">메모 전체 지우기</button>
+        <button class="primary" id="printBtn" type="button" title="질문지를 인쇄하거나 PDF로 저장" aria-label="질문지를 인쇄하거나 PDF로 저장">인쇄·PDF 저장</button>
+        <button class="secondary" id="compactBtn" type="button" title="질문의 보조 설명을 숨기거나 표시" aria-label="핵심 질문만 보기" aria-pressed="false">핵심 질문만 보기</button>
+        <button class="backup" id="jsonExportBtn" type="button" title="현재 메모를 JSON 백업 파일로 저장" aria-label="메모 JSON 백업 저장">메모 백업 저장</button>
+        <button class="backup" id="jsonImportBtn" type="button" title="JSON 백업 파일에서 메모 복원" aria-label="메모 JSON 백업 불러오기">백업 불러오기</button>
+        <button class="secondary" id="txtExportBtn" type="button" title="현재 메모를 읽기 쉬운 텍스트 파일로 저장" aria-label="메모를 텍스트 파일로 저장">텍스트로 저장</button>
+        <button class="danger" id="clearBtn" type="button" title="브라우저에 저장된 모든 인터뷰 메모 삭제" aria-label="메모 전체 지우기">메모 전체 지우기</button>
+        <input class="visually-hidden" id="backupFileInput" type="file" accept=".json,application/json" tabindex="-1" aria-hidden="true" />
       </div>
     </header>
 
@@ -633,30 +774,473 @@
     </footer>
   </div>
 
+  <div class="toast-region" id="toastRegion" aria-live="polite" aria-atomic="true"></div>
+
   <script>
-    const page = document.getElementById("page");
-    const compactBtn = document.getElementById("compactBtn");
+    (() => {
+      "use strict";
 
-    function toggleCompact(){
-      page.classList.toggle("compact");
-      compactBtn.textContent = page.classList.contains("compact")
-        ? "전체 설명 보기"
-        : "핵심 질문만 보기";
-    }
+      const STORAGE_PREFIX = "hanui-ai-interview-";
+      const SAVE_TIME_KEY = STORAGE_PREFIX + "last-saved-at";
+      const BACKUP_VERSION = "1.0";
+      const MAX_BACKUP_SIZE = 2 * 1024 * 1024;
 
-    document.querySelectorAll("textarea[data-note]").forEach((area) => {
-      const key = "hanui-ai-interview-" + area.dataset.note;
-      area.value = localStorage.getItem(key) || "";
-      area.addEventListener("input", () => localStorage.setItem(key, area.value));
-    });
+      const page = document.getElementById("page");
+      const compactBtn = document.getElementById("compactBtn");
+      const printBtn = document.getElementById("printBtn");
+      const jsonExportBtn = document.getElementById("jsonExportBtn");
+      const jsonImportBtn = document.getElementById("jsonImportBtn");
+      const txtExportBtn = document.getElementById("txtExportBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const backupFileInput = document.getElementById("backupFileInput");
+      const saveStatus = document.getElementById("saveStatus");
+      const storageError = document.getElementById("storageError");
+      const toastRegion = document.getElementById("toastRegion");
+      const noteAreas = Array.from(document.querySelectorAll("textarea[data-note]"));
 
-    function clearNotes(){
-      if(!confirm("저장된 인터뷰 메모를 모두 지울까요?")) return;
-      document.querySelectorAll("textarea[data-note]").forEach((area) => {
-        localStorage.removeItem("hanui-ai-interview-" + area.dataset.note);
-        area.value = "";
+      let saveStatusTimer = null;
+      let storageWarningShown = false;
+      let storageAvailable = checkStorageAvailability();
+
+      function checkStorageAvailability(){
+        try{
+          const testKey = STORAGE_PREFIX + "storage-test";
+          window.localStorage.setItem(testKey, "1");
+          window.localStorage.removeItem(testKey);
+          return true;
+        }catch(error){
+          return false;
+        }
+      }
+
+      function markStorageUnavailable(){
+        storageAvailable = false;
+        storageError.hidden = false;
+        setStatus("브라우저 자동 저장을 사용할 수 없습니다.", "warning");
+        if(!storageWarningShown){
+          storageWarningShown = true;
+          showToast(
+            "브라우저 자동 저장을 사용할 수 없습니다. 메모 백업 저장 기능을 이용해 주세요.",
+            "warning",
+            6500
+          );
+        }
+      }
+
+      function storageGet(key){
+        if(!storageAvailable) return null;
+        try{
+          return window.localStorage.getItem(key);
+        }catch(error){
+          markStorageUnavailable();
+          return null;
+        }
+      }
+
+      function storageSet(key, value){
+        if(!storageAvailable) return false;
+        try{
+          window.localStorage.setItem(key, value);
+          return true;
+        }catch(error){
+          markStorageUnavailable();
+          return false;
+        }
+      }
+
+      function storageRemove(key){
+        if(!storageAvailable) return false;
+        try{
+          window.localStorage.removeItem(key);
+          return true;
+        }catch(error){
+          markStorageUnavailable();
+          return false;
+        }
+      }
+
+      function setStatus(message, state = "idle"){
+        saveStatus.textContent = message;
+        saveStatus.dataset.state = state;
+      }
+
+      function setTemporaryStatus(message, state, duration, fallbackMessage, fallbackState){
+        window.clearTimeout(saveStatusTimer);
+        setStatus(message, state);
+        saveStatusTimer = window.setTimeout(() => {
+          setStatus(fallbackMessage, fallbackState);
+        }, duration);
+      }
+
+      function formatStatusDate(date){
+        try{
+          return new Intl.DateTimeFormat("ko-KR", {
+            year:"numeric",
+            month:"numeric",
+            day:"numeric",
+            hour:"numeric",
+            minute:"2-digit",
+            hour12:true
+          }).format(date);
+        }catch(error){
+          return formatKoreanDate(date);
+        }
+      }
+
+      function formatKoreanDate(date){
+        const period = date.getHours() < 12 ? "오전" : "오후";
+        const hour = date.getHours() % 12 || 12;
+        return `${date.getFullYear()}년 ${date.getMonth() + 1}월 ${date.getDate()}일 ${period} ${hour}:${pad(date.getMinutes())}`;
+      }
+
+      function pad(value){
+        return String(value).padStart(2, "0");
+      }
+
+      function formatFileStamp(date){
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}_${pad(date.getHours())}${pad(date.getMinutes())}`;
+      }
+
+      function toOffsetISOString(date){
+        const offsetMinutes = -date.getTimezoneOffset();
+        const sign = offsetMinutes >= 0 ? "+" : "-";
+        const absoluteOffset = Math.abs(offsetMinutes);
+        const offsetHours = pad(Math.floor(absoluteOffset / 60));
+        const offsetRemainder = pad(absoluteOffset % 60);
+        return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}` +
+          `T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}` +
+          `${sign}${offsetHours}:${offsetRemainder}`;
+      }
+
+      function showToast(message, type = "success", duration = 3800){
+        const allowedTypes = new Set(["success", "warning", "error"]);
+        const toast = document.createElement("div");
+        toast.className = `toast ${allowedTypes.has(type) ? type : "success"}`;
+        toast.textContent = message;
+        toast.setAttribute("role", type === "error" ? "alert" : "status");
+        toastRegion.appendChild(toast);
+        window.setTimeout(() => toast.remove(), duration);
+      }
+
+      function getQuestionData(area){
+        const card = area.closest(".card");
+        return {
+          id:area.dataset.note,
+          number:card.querySelector(".number").textContent.trim(),
+          title:card.querySelector("h2").textContent.trim(),
+          question:card.querySelector(".question").textContent.trim(),
+          memo:area.value
+        };
+      }
+
+      function updateWrittenBadge(area){
+        const card = area.closest(".card");
+        let badge = card.querySelector(".written-badge");
+        if(!badge){
+          badge = document.createElement("span");
+          badge.className = "written-badge";
+          badge.textContent = "작성됨";
+          card.querySelector(".number").insertAdjacentElement("afterend", badge);
+        }
+        badge.hidden = area.value.trim().length === 0;
+      }
+
+      function recordSavedAt(date){
+        return storageSet(SAVE_TIME_KEY, date.toISOString());
+      }
+
+      function handleNoteInput(area){
+        updateWrittenBadge(area);
+        if(!storageAvailable){
+          markStorageUnavailable();
+          return;
+        }
+
+        window.clearTimeout(saveStatusTimer);
+        setStatus("저장 중…", "saving");
+        const savedAt = new Date();
+        const noteSaved = storageSet(STORAGE_PREFIX + area.dataset.note, area.value);
+        const timeSaved = noteSaved && recordSavedAt(savedAt);
+
+        if(timeSaved){
+          saveStatusTimer = window.setTimeout(() => {
+            setStatus(`자동 저장 완료 · ${formatStatusDate(savedAt)}`, "saved");
+          }, 260);
+        }
+      }
+
+      function toggleCompact(){
+        const compact = page.classList.toggle("compact");
+        compactBtn.textContent = compact ? "전체 설명 보기" : "핵심 질문만 보기";
+        compactBtn.setAttribute("aria-label", compact ? "전체 설명 보기" : "핵심 질문만 보기");
+        compactBtn.setAttribute("aria-pressed", String(compact));
+      }
+
+      function createBackupData(exportedAt){
+        return {
+          version:BACKUP_VERSION,
+          title:document.title,
+          exportedAt:toOffsetISOString(exportedAt),
+          answers:noteAreas.map(getQuestionData)
+        };
+      }
+
+      function downloadBlob(blob, fileName){
+        let objectUrl = "";
+        try{
+          objectUrl = URL.createObjectURL(blob);
+          const link = document.createElement("a");
+          link.href = objectUrl;
+          link.download = fileName;
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+          window.setTimeout(() => URL.revokeObjectURL(objectUrl), 1000);
+          return true;
+        }catch(error){
+          if(objectUrl) URL.revokeObjectURL(objectUrl);
+          showToast("파일을 저장하지 못했습니다. 브라우저의 다운로드 설정을 확인해 주세요.", "error", 6000);
+          return false;
+        }
+      }
+
+      function exportJson(){
+        try{
+          const now = new Date();
+          const backup = createBackupData(now);
+          const blob = new Blob([JSON.stringify(backup, null, 2)], {
+            type:"application/json;charset=utf-8"
+          });
+          const fileName = `한의약_AI_인터뷰_메모_${formatFileStamp(now)}.json`;
+          if(downloadBlob(blob, fileName)){
+            showToast("JSON 메모 백업 파일을 저장했습니다.", "success");
+          }
+        }catch(error){
+          showToast("JSON 백업 파일을 만드는 중 오류가 발생했습니다.", "error", 6000);
+        }
+      }
+
+      function exportText(){
+        try{
+          const now = new Date();
+          const lines = [
+            "한의약 AI 인터뷰 메모",
+            `저장일시: ${formatKoreanDate(now)}`,
+            ""
+          ];
+
+          noteAreas.forEach((area, index) => {
+            const answer = getQuestionData(area);
+            lines.push(
+              `[질문 ${answer.number}]`,
+              answer.title,
+              "",
+              "질문:",
+              answer.question,
+              "",
+              "답변 메모:",
+              answer.memo,
+              ""
+            );
+            if(index < noteAreas.length - 1){
+              lines.push("----------------------------------------", "");
+            }
+          });
+
+          const blob = new Blob(["\uFEFF", lines.join("\r\n")], {
+            type:"text/plain;charset=utf-8"
+          });
+          const fileName = `한의약_AI_인터뷰_메모_${formatFileStamp(now)}.txt`;
+          if(downloadBlob(blob, fileName)){
+            showToast("읽기 쉬운 TXT 메모 파일을 저장했습니다.", "success");
+          }
+        }catch(error){
+          showToast("텍스트 파일을 만드는 중 오류가 발생했습니다.", "error", 6000);
+        }
+      }
+
+      function readFileAsText(file){
+        return new Promise((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(String(reader.result || ""));
+          reader.onerror = () => reject(new Error("파일을 읽지 못했습니다."));
+          reader.readAsText(file, "utf-8");
+        });
+      }
+
+      function validateBackup(data){
+        if(!data || typeof data !== "object" || Array.isArray(data)){
+          throw new Error("올바른 JSON 백업 파일이 아닙니다.");
+        }
+        if(typeof data.version !== "string"){
+          throw new Error("백업 파일 형식 버전이 없습니다.");
+        }
+        if(data.version !== BACKUP_VERSION){
+          throw new Error(`지원하지 않는 백업 버전입니다. 버전 ${BACKUP_VERSION} 파일을 선택해 주세요.`);
+        }
+        if(typeof data.title !== "string" || data.title.trim() === ""){
+          throw new Error("백업 파일에 질문지 제목이 없습니다.");
+        }
+        if(typeof data.exportedAt !== "string" || data.exportedAt.trim() === ""){
+          throw new Error("백업 파일에 저장 날짜와 시간이 없습니다.");
+        }
+        if(!Array.isArray(data.answers)){
+          throw new Error("백업 파일에 메모 목록이 없습니다.");
+        }
+
+        data.answers.forEach((answer, index) => {
+          if(!answer || typeof answer !== "object" || Array.isArray(answer)){
+            throw new Error(`${index + 1}번째 메모 항목의 형식이 올바르지 않습니다.`);
+          }
+          if(typeof answer.id !== "string" || answer.id.trim() === ""){
+            throw new Error(`${index + 1}번째 메모 항목에 질문 ID가 없습니다.`);
+          }
+          if(typeof answer.memo !== "string"){
+            throw new Error(`${index + 1}번째 메모 항목의 메모 형식이 올바르지 않습니다.`);
+          }
+        });
+
+        return data;
+      }
+
+      async function importBackupFile(file){
+        if(!file) return;
+        if(file.size === 0){
+          showToast("선택한 파일이 비어 있습니다.", "error", 6000);
+          return;
+        }
+        if(file.size > MAX_BACKUP_SIZE){
+          showToast("백업 파일이 너무 큽니다. 2MB 이하의 JSON 파일을 선택해 주세요.", "error", 6500);
+          return;
+        }
+
+        try{
+          const text = await readFileAsText(file);
+          let parsed;
+          try{
+            parsed = JSON.parse(text.replace(/^\uFEFF/, ""));
+          }catch(error){
+            throw new Error("JSON 내용을 읽을 수 없습니다. 올바른 백업 파일인지 확인해 주세요.");
+          }
+
+          const backup = validateBackup(parsed);
+          const areasById = new Map(noteAreas.map((area) => [area.dataset.note, area]));
+          const restoredIds = new Set();
+          let ignoredCount = 0;
+
+          backup.answers.forEach((answer) => {
+            const area = areasById.get(answer.id);
+            if(!area){
+              ignoredCount += 1;
+              return;
+            }
+            area.value = answer.memo;
+            updateWrittenBadge(area);
+            storageSet(STORAGE_PREFIX + area.dataset.note, area.value);
+            restoredIds.add(answer.id);
+          });
+
+          if(restoredIds.size === 0){
+            showToast("현재 질문지와 일치하는 질문 ID가 없어 복원된 메모가 없습니다.", "warning", 6500);
+            return;
+          }
+
+          const restoredAt = new Date();
+          if(storageAvailable && recordSavedAt(restoredAt)){
+            setStatus(`자동 저장 완료 · ${formatStatusDate(restoredAt)}`, "saved");
+          }
+
+          const ignoredMessage = ignoredCount > 0
+            ? ` 알 수 없는 질문 ${ignoredCount}개는 무시했습니다.`
+            : "";
+          showToast(`${restoredIds.size}개 질문의 메모를 복원했습니다.${ignoredMessage}`, "success", 5200);
+        }catch(error){
+          const message = error instanceof Error ? error.message : "백업 파일을 불러오는 중 오류가 발생했습니다.";
+          showToast(message, "error", 6500);
+        }
+      }
+
+      function requestBackupImport(){
+        const confirmed = window.confirm("현재 메모를 백업 파일의 내용으로 덮어쓸까요?");
+        if(!confirmed) return;
+        backupFileInput.value = "";
+        backupFileInput.click();
+      }
+
+      function clearNotes(){
+        if(!window.confirm("저장된 인터뷰 메모를 모두 지울까요?")) return;
+        if(!window.confirm("이 작업은 되돌릴 수 없습니다. 삭제 전에 백업 파일을 저장하셨습니까?")) return;
+
+        window.clearTimeout(saveStatusTimer);
+        noteAreas.forEach((area) => {
+          area.value = "";
+          updateWrittenBadge(area);
+          storageRemove(STORAGE_PREFIX + area.dataset.note);
+        });
+        storageRemove(SAVE_TIME_KEY);
+
+        const fallbackMessage = storageAvailable
+          ? "자동 저장 사용 가능"
+          : "브라우저 자동 저장을 사용할 수 없습니다.";
+        const fallbackState = storageAvailable ? "idle" : "warning";
+        setTemporaryStatus(
+          "모든 메모가 삭제되었습니다.",
+          "saved",
+          4200,
+          fallbackMessage,
+          fallbackState
+        );
+        showToast("모든 인터뷰 메모를 삭제했습니다.", "success");
+      }
+
+      function restoreSavedNotes(){
+        let restoredCount = 0;
+        noteAreas.forEach((area) => {
+          const savedMemo = storageGet(STORAGE_PREFIX + area.dataset.note);
+          if(savedMemo !== null){
+            area.value = savedMemo;
+            if(savedMemo.trim()) restoredCount += 1;
+          }
+          updateWrittenBadge(area);
+          area.addEventListener("input", () => handleNoteInput(area));
+        });
+
+        if(!storageAvailable){
+          markStorageUnavailable();
+          return;
+        }
+
+        const savedAtValue = storageGet(SAVE_TIME_KEY);
+        if(savedAtValue){
+          const savedAt = new Date(savedAtValue);
+          if(!Number.isNaN(savedAt.getTime())){
+            setStatus(`자동 저장 완료 · ${formatStatusDate(savedAt)}`, "saved");
+            return;
+          }
+        }
+
+        setStatus(restoredCount > 0 ? "기존 자동 저장 메모를 불러왔습니다." : "자동 저장 사용 가능", restoredCount > 0 ? "saved" : "idle");
+      }
+
+      printBtn.addEventListener("click", () => window.print());
+      compactBtn.addEventListener("click", toggleCompact);
+      jsonExportBtn.addEventListener("click", exportJson);
+      jsonImportBtn.addEventListener("click", requestBackupImport);
+      txtExportBtn.addEventListener("click", exportText);
+      clearBtn.addEventListener("click", clearNotes);
+      backupFileInput.addEventListener("change", async () => {
+        const file = backupFileInput.files && backupFileInput.files[0];
+        await importBackupFile(file);
+        backupFileInput.value = "";
       });
-    }
+
+      window.addEventListener("unhandledrejection", () => {
+        showToast("처리 중 예상하지 못한 오류가 발생했습니다. 다시 시도해 주세요.", "error", 6000);
+      });
+
+      if(!storageAvailable) markStorageUnavailable();
+      restoreSavedNotes();
+    })();
   </script>
 </body>
 </html>
